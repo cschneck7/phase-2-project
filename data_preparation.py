@@ -290,9 +290,12 @@ def recursive_elimination(X_train, y_train, min_features=1):
     selector = RFECV(lr, cv=splitter, min_features_to_select=min_features)
     results = selector.fit(X_train, y_train)
     
+    selected_columns = []
     for i, column in enumerate(X_train.columns):
         if results.support_[i] == True:
-            print(column)
+            selected_columns.append(column)
+    
+    return selected_columns
             
             
             
