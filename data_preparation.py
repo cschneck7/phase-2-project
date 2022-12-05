@@ -273,12 +273,13 @@ def create_all_interactions(X_train, X_train_OHE, continuous):
     return pd.concat([X_train_interactions_stand_df, X_train_OHE_interactions], axis=1)
 
 
-def recursive_elimination(X_train, y_train):
+def recursive_elimination(X_train, y_train, min_features=1):
     '''
     Performs Recursive elimination on X_train to find features with best resulting
     Rsquared value
     
-    inputs: (X_train, y_train)
+    inputs: (X_train, y_train,
+            minimum features to select (default=1))
     output: Prints columns that survived for final model
     '''
 
@@ -286,7 +287,7 @@ def recursive_elimination(X_train, y_train):
     splitter = ShuffleSplit(n_splits=5, test_size=0.25, random_state=1)
     
     # Instantiate and fit the selector
-    selector = RFECV(lr, cv=splitter)
+    selector = RFECV(lr, cv=splitter, min_features_to_select=min_features)
     results = selector.fit(X_train, y_train)
     
     for i, column in enumerate(X_train.columns):
