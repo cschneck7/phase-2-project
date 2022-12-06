@@ -58,13 +58,13 @@ def base_plots_log(x, y):
     axes[1].hist(x_log, bins=30)
     axes[1].set_xlabel('log(Sqare Foot Living)')
     axes[1].set_ylabel('count')
-    axes[1].set_title('Square Foot Living')
+    axes[1].set_title('Log Square Foot Living')
     
 #     Log Price Histrogram
     axes[2].hist(y_log, bins=30)
     axes[2].set_xlabel('log(Price)')
     axes[2].set_ylabel('count')
-    axes[2].set_title('Price')
+    axes[2].set_title('Log Price')
     
     
 def all_scatters(X_train, y_train):
@@ -80,10 +80,13 @@ def all_scatters(X_train, y_train):
     
     gs = GridSpec(3, 3, figure=fig)
     
+#     Gets name of target variable
+    target_var = y_train.name
+    
     axes = []
     for i, column in  enumerate(X_train.columns):
         axes.append(fig.add_subplot(gs[i//3, i%3]))
         axes[i].scatter(X_train[column], y_train)
         axes[i].set_xlabel(column)
-        axes[i].set_ylabel('Price')
-        axes[i].set_title('Price vs. ' + column)
+        axes[i].set_ylabel(target_var)
+        axes[i].set_title(target_var + ' vs. ' + column)
