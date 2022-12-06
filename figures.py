@@ -28,7 +28,7 @@ def base_plots(x, y):
     axes[1].set_title('Square Foot Living')
     
 #     Price Histogram
-    axes[2].hist(x, bins=30)
+    axes[2].hist(y, bins=30)
     axes[2].set_xlabel('Price')
     axes[2].set_ylabel('count')
     axes[2].set_title('Price')
@@ -61,7 +61,7 @@ def base_plots_log(x, y):
     axes[1].set_title('Square Foot Living')
     
 #     Log Price Histrogram
-    axes[2].hist(x_log, bins=30)
+    axes[2].hist(y_log, bins=30)
     axes[2].set_xlabel('log(Price)')
     axes[2].set_ylabel('count')
     axes[2].set_title('Price')
