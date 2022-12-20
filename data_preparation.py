@@ -6,6 +6,9 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import PolynomialFeatures
 from itertools import combinations
 from sklearn.feature_selection import RFECV
+import statsmodels.api as sm
+from statsmodels.formula.api import ols
+from sklearn.model_selection import train_test_split
     
 def initial_prep(df):
 #     Maps new values for condition column
@@ -30,10 +33,19 @@ def initial_prep(df):
 
 
 def omit_outliers_dups(df):
+    '''
+    Removes outliers and duplicate entries
+    
+    Input: dataframe
+    Output: Modified dataframe
+    '''
+    
+#     Omits outliers
     df2 = df[(df.sqft_living <= 8000)
            & (df.price <= 4000000)
            & (df.bedrooms != 33)].copy()
     
+#     Drops Duplicates
     df2.drop_duplicates(inplace=True)
     
     return df2
@@ -68,112 +80,77 @@ def cross_val(X_train, y_train):
     return baseline_scores
 
 
-# def second_model_prep(X_train, y_train, categoricals):
-#     '''
-#     Creates dummy variables for categorical data.
-#     Standardizes continuous variables.
-#     Concatenates the dummy variables and continuous variables
-#     into one dataframe.
-    
-#     inputs: (X_train, y_train, Categorical_columns)
-#     '''
-    
-# #     Create dataframe with just category variables and changes
-# #     them to type category
-#     cat_df = X_train[categoricals].astype('category')
-
-# #     Creates dummy variables and drops firts column of each
-# #     set of dummy variables to help prevent multicollinearity
-#     cat_dummies = pd.get_dummies(cat_df, drop_first=True)
-
-# #     Drops categorical variables from original dataset
-#     X_train_cont = X_train.drop(categoricals, axis=1).copy()
-    
-# #     Stardardizes numerical columns
-#     X_train_stand = StandardScaler().fit_transform(X_train_cont)
-#     X_train_stand = pd.DataFrame(X_train_stand, 
-#                                  columns=X_train_cont.columns,
-#                                  index=X_train_cont.index)
-    
-# #     Concatinates dummy variables and standardized continuous variables
-#     X_train_prep = pd.concat([X_train_stand, cat_dummies], axis=1)    
-    
-#     return X_train_prep
-
-
-def create_interactions(X_train):
+def model_summary(X_train, y_train):
     '''
-    Creates interactions between variables
+    Creates a linear regression model using statsmodels
     
-    input: (Features)
-            
-    output: Features dataframe with interactions added
+    Inputs: X_train, y_train
+    Output: linear regression model
     '''
-
-#     Creatures PolynomialFeatures model, of degree 2 and
-#     only between features
-    poly = PolynomialFeatures(degree=2, interaction_only=True)
-
-#     Creates interactions
-    X_train_interactions = poly.fit_transform(X_train)
-
-#     Gets feature names described by fit
-    feature_names = poly.get_feature_names()
-
-#     Creates list of feature names described in fit that describe each individual feature
-    interaction_ind_features = [('x' + str(i)) for i in range(len(X_train.columns))]
-
-#     Creates mapping of fit feature name to actual feature name
-    interaction_map = {x: name for x, name in zip(interaction_ind_features,
-                                                  X_train.columns)}
-
-#     Iterates through all features created by polynomial fit and assigns
-#     understandable names
-    column_names = []
-    for feature in feature_names:
-        if feature == '1':
-            new_name = 'const'
-        else:
-            split_feature = feature.split(' ')
-            new_name = interaction_map[split_feature[0]]
-            if (len(split_feature) > 1):
-                new_name = new_name + '*' + interaction_map[split_feature[1]]
-        column_names.append(new_name)
-
-#      Creates a dataframe of new features and drops the intercept column of 1's
-    interaction_df = (pd.DataFrame(X_train_interactions, columns=column_names, 
-                                   index=X_train.index).drop(columns='const', axis=1))
     
-#     returns concatenated standardized interaction df and OHE df
-    return interaction_df
+#     Independant Variables with a column of 1's added for intercept
+    predictors = sm.add_constant(X_train)
+    
+#     Creates linear regression model
+    model = sm.OLS(y_train, predictors).fit()
+
+    return model
 
 
-def recursive_elimination(X_train, y_train, min_features=1):
+def log_columns(data, columns=0):
     '''
-    Performs Recursive elimination on X_train to find features with best resulting
-    Rsquared value
+    Takes in a dataseries or dataframe and logs columns in input variable columns.
+    If dataseries, input variable columns isn't necessary
+    If dataframe, columns is by default all columns
     
-    inputs: (X_train, y_train,
-            minimum features to select (default=1))
-    output: Prints columns that survived for final model
+    Input: data, columns (default all columns)
+    Ouptut: data with called out columns changed to log form
     '''
+    
+#     Checks if data is dataseries or dataframe, also if input column variable is empty
+    try:
+#         Sets columns variable to all columns if columns varible is empty
+        if columns==0:
+            columns = data.columns
+#         Notes that data is not a dataseries
+        ds = False
+    except:
+#         notes that data is a dataseries
+        ds = True
+#         Crates variable for dataseries name 
+        name = data.name
+    
+    data_log = data.copy()
+    
+#     Logs columns, and changes column names
+    if ds:
+        new_name = 'log_' + name
+        data_log = np.log(data_log)
+        data_log.rename(new_name, inplace=True)
+    else:
+        new_names = {column: ('log_' + column) for column in columns}
+        data_log[columns] = np.log(data_log[columns])
+        data_log.rename(columns=new_names, inplace=True)
+    
+    return data_log
 
-    lr = LinearRegression()
-    splitter = ShuffleSplit(n_splits=5, test_size=0.25, random_state=1)
+
+def correlation_check(X_train):
+#     Create correlation matrix, manipulate them into one column
+    df = X_train.corr().stack().reset_index().sort_values(0, ascending=False)
     
-    # Instantiate and fit the selector
-    selector = RFECV(lr, cv=splitter, min_features_to_select=min_features)
-    results = selector.fit(X_train, y_train)
-    
-    selected_columns = []
-    rejected_columns = []
-    for i, column in enumerate(X_train.columns):
-        if results.support_[i] == True:
-            selected_columns.append(column)
-        else:
-            rejected_columns.append(column)
-    
-    return selected_columns, rejected_columns
-            
-            
-            
+#     Creates variables for new index
+    df['pairs'] = list(zip(df.level_0, df.level_1))
+
+#     Sets new index to pairs
+    df.set_index(['pairs'], inplace = True)
+
+    #drops level columns
+    df.drop(columns=['level_1', 'level_0'], inplace = True)
+
+    # rename correlation column as cc rather than 0
+    df.columns = ['cc']
+
+    # drop duplicates.
+    df.drop_duplicates(inplace=True)
+    return df[(df.cc>.3) & (df.cc <1)]

@@ -2,6 +2,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.gridspec import GridSpec
 import numpy as np
+import statsmodels.api as sm
+from statsmodels.formula.api import ols
+import scipy.stats as stats
 
 plt.style.use('bmh')
     
@@ -90,3 +93,32 @@ def all_scatters(X_train, y_train):
         axes[i].set_xlabel(column)
         axes[i].set_ylabel(target_var)
         axes[i].set_title(target_var + ' vs. ' + column)
+        
+        
+def assumption_plots(model, X_train, y_train):
+    '''
+    Creates QQ-plot, and scatter plot checking homoscedasticity
+    
+    Inputs: model, X_train, y_train
+    '''
+    
+#     finds residuals from real data and model
+    residuals = model.resid
+#     finds predicted values for training data 
+    pred = model.predict(sm.add_constant(X_train))
+    
+    fig, axes = plt.subplots(figsize=(16,8), ncols=2, nrows=1)
+    
+#     Creates QQ-plot
+    sm.graphics.qqplot(residuals, dist=stats.norm,
+                      line='45', fit='True', ax=axes[0])
+    axes[0].set_title('QQ Plot')
+    
+#     
+    axes[1].scatter(y_train, pred, color='red', label='Model')
+    axes[1].plot(y_train, y_train, color='blue', label='Actual Data')
+    axes[1].legend()
+    axes[1].set_title('Model Predictions vs. Actual Data')
+    axes[1].set_xlabel('Actual Data')
+    axes[1].set_ylabel('Model Results')            
+            
