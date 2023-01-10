@@ -9,6 +9,7 @@ from sklearn.feature_selection import RFECV
 import statsmodels.api as sm
 from statsmodels.formula.api import ols
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
     
 def initial_prep(df):
 #     Maps new values for condition column
@@ -136,6 +137,12 @@ def log_columns(data, columns=0):
 
 
 def correlation_check(X_train):
+    '''
+    Returns correlation dataseries
+    
+    input: X
+    output: correlation dataseries for correlations > .3
+    '''
 #     Create correlation matrix, manipulate them into one column
     df = X_train.corr().stack().reset_index().sort_values(0, ascending=False)
     
@@ -154,3 +161,14 @@ def correlation_check(X_train):
     # drop duplicates.
     df.drop_duplicates(inplace=True)
     return df[(df.cc>.3) & (df.cc <1)]
+
+def mse(model, X, y):
+    '''
+    Returns mean squared error
+    
+    inputs: model, X, y
+    output: mean squared error
+    '''
+    pred = model.predict(sm.add_constant(X))
+    
+    return (mean_squared_error(y, pred))
