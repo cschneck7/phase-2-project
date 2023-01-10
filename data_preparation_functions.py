@@ -110,7 +110,7 @@ def log_columns(data, columns=0):
     
 #     Checks if data is dataseries or dataframe, also if input column variable is empty
     try:
-#         Sets columns variable to all columns if columns varible is empty
+#         Sets columns variable to all columns if columns variable is empty
         if columns==0:
             columns = data.columns
 #         Notes that data is not a dataseries
@@ -129,7 +129,10 @@ def log_columns(data, columns=0):
         data_log = np.log(data_log)
         data_log.rename(new_name, inplace=True)
     else:
-        new_names = {column: ('log_' + column) for column in columns}
+        if type(columns) == str:
+            new_names = {columns: ('log_' + columns)}
+        else:
+            new_names = {column: ('log_' + column) for column in columns}
         data_log[columns] = np.log(data_log[columns])
         data_log.rename(columns=new_names, inplace=True)
     
