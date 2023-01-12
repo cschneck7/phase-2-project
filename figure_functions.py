@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
+import pandas as pd
 from matplotlib.gridspec import GridSpec
 import numpy as np
 import statsmodels.api as sm
@@ -131,7 +132,7 @@ def assumption_plots(model, X_train, y_train):
   
 
 
- def high_resid_plots(X, y, model, resid_cutoff):
+def high_resid_plots(X, y, model, resid_cutoff):
     '''
     Creates scatter plots for all features and target variable containing 
     entries with residuals greater then assigned resid_cutoff

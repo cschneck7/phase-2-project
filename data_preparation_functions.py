@@ -81,6 +81,40 @@ def cross_val(X_train, y_train):
     return baseline_scores
 
 
+def rsquared_df(X, y, i, df=pd.DataFrame()):
+    '''
+    Returns dataframe with new model and old models rsquared values
+    
+    Inputs: X = model features
+            y = target variable
+            i = index
+            df = df of previus model results,
+                 (default = empty dataframe),
+                 if first entry leave out
+    
+    Output: DataFrame of new and old models rsquared values
+    '''
+#     Performs cross validation on dataset
+    cross_val_results = cross_val(X, y)
+    
+#     creates dictionary of current models rsquared values
+    data = {'train_rsquared': [round(cross_val_results['train_score'].mean(), 5)],
+            'test_rsquared': [round(cross_val_results['test_score'].mean(), 5)]}
+#     Creates dataframe containing new models data
+    new_data_df = pd.DataFrame(data, index=[i])
+    
+#     Creates dataframe containing old and new models rsquared values
+#     Checks if this is first entry
+    if df.empty:
+        df = new_data_df
+    else: 
+#         if not, concantenates new and old data together
+        df = pd.concat([df, new_data_df])
+    
+#     Returns DataFrame
+    return df
+
+
 def model_summary(X_train, y_train):
     '''
     Creates a linear regression model using statsmodels
@@ -214,38 +248,56 @@ def outlier_percentage(X ,y, model, resid_cutoff, columns):
         print(c + ': %' + str(perc))
     
 
-def model6_data(X, y, model, resid_cutoff, column):
+def model6_data(X_train, y_train, X_test, y_test, 
+                model, resid_cutoff, column):
     '''
     Creates new X and y data for entries lower than the minimum
     value of column that is above or equal to the the resid_cutoff
     value
     
-     Inputs: X = features
-             y = target variable
-             model = linear regression model
-             resid_cutoff = high residual mark
-             column = column deciding cutoff
+    Inputs: X_train = training set features
+            y_train =  training set target variable
+            X_test = test set features
+            y_test =  test set target variable
+            model = linear regression model
+            resid_cutoff = high residual mark
+            column = column deciding cutoff
+             
+    Output: Dictionary containing new training sets, test sets,
+            and cutoff value for deciding column
     '''
     
 #     Concatenates features and target varibale    
-    df = pd.concat([X, y], axis=1)
+    df_train = pd.concat([X_train, y_train], axis=1)
+    df_test = pd.concat([X_test, y_test], axis=1)
     
-#     Creates residual column in dataframe    
-    df['resid'] = model.resid
+#     Creates residual column in training dataframe    
+    df_train['resid'] = model.resid
     
-#     Find minimum value dependent on residual cutoff
-    min_val = min(df[df.resid >= resid_cutoff][column])
+#     Find minimum value dependent on residual cutoff in training dataframe
+    min_val = min(df_train[df_train.resid >= resid_cutoff][column])
 
-#     Creates datafrome of all entries lower than min_val
-    df = df[df[column] < min_val]
+#     Creates datafromes of all entries lower than min_val
+    df_train = df_train[df_train[column] < min_val]
+    df_test = df_test[df_test[column] < min_val]
     
-#     Drops residual column    
-    df.drop(columns='resid', axis=1, inplace=True)
+#     Drops residual column from training set   
+    df_train.drop(columns='resid', axis=1, inplace=True)
     
 #     Creates new target variable data
-    new_y = df[y.name]
-#     Creates new feature data
-    new_X = df.drop(columns=y.name, axis=1)
+    y_name = y_train.name
+    new_y_train = df_train[y_name]
+    new_y_test = df_test[y_name]
     
-#     returns new data and min_val
-    return (new_X, new_y, min_val)
+#     Creates new feature data
+    new_X_train = df_train.drop(columns=y_name, axis=1)
+    new_X_test = df_test.drop(columns=y_name, axis=1)
+    
+#     Creates dictionary containing all data
+    data_dict = {'X_train': new_X_train,
+                 'y_train': new_y_train,
+                 'X_test': new_X_test,
+                 'y_test': new_y_test,
+                 'cutoff': min_val}
+#     returns dictionary of new data and min_val
+    return data_dict
