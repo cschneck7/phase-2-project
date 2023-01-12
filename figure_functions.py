@@ -101,36 +101,6 @@ def all_scatters(X_train, y_train):
         axes[i].set_ylabel(target_var)
         axes[i].set_title(target_var + ' vs. ' + column)
         
-        
-def assumption_plots(model, X_train, y_train):
-    '''
-    Creates QQ-plot, and scatter plot checking homoscedasticity
-    
-    Inputs: model, X_train, y_train
-    '''
-    
-#     finds residuals from real data and model
-    residuals = model.resid
-#     finds predicted values for training data 
-    pred = model.predict(sm.add_constant(X_train))
-    
-#     Creates figure
-    fig, axes = plt.subplots(figsize=(16,8), ncols=2, nrows=1)
-    
-#     Creates QQ-plot
-    sm.graphics.qqplot(residuals, dist=stats.norm,
-                      line='45', fit='True', ax=axes[0])
-    axes[0].set_title('QQ Plot')
-    
-#     Creates figure checking homoscedasticity
-    axes[1].scatter(y_train, pred, color='red', label='Model')
-    axes[1].plot(y_train, y_train, color='blue', label='Actual Data')
-    axes[1].legend()
-    axes[1].set_title('Model Predictions vs. Actual Data')
-    axes[1].set_xlabel('Actual Data')
-    axes[1].set_ylabel('Model Results')            
-  
-
 
 def high_resid_plots(X, y, model, resid_cutoff):
     '''
@@ -172,3 +142,47 @@ def high_resid_plots(X, y, model, resid_cutoff):
         axes[i].set_xlabel(column)
         axes[i].set_ylabel('Residuals')
         axes[i].set_title('High Residuals vs. ' + column)    
+        
+
+
+def normality_plots(resid):
+    '''
+    Plots histogram and QQ-plot for residuals
+    
+    Input: resid = model residuals
+    '''
+#     Creates figure
+    fig, axes = plt.subplots(ncols=2, nrows=1, figsize=(16, 8))
+    
+#     Creates residual histogram
+    sns.histplot(resid, kde=True, ax=axes[0])
+    axes[0].set_title('Residual Histogram')
+    axes[0].set_xlabel('Residuals')
+    axes[0].set_ylabel('Count')
+    
+#     Creates QQ-plot
+    sm.graphics.qqplot(resid, dist=stats.norm,
+                      line='45', fit='True', ax=axes[1])
+    axes[1].set_title('Residual QQ-plot')        
+        
+        
+        
+def homoskedasticity_plot(y, model):
+    '''
+    Creates scatterplot of residuals against expected
+    outcome to check for homoskedasticity
+    
+    Inputs: y = target variable/real outcomes
+            model = linear regression model
+    '''
+    
+#     Finds residuals of model
+    residuals = model.resid
+#     Names dataseries
+    residuals.name = 'resid'
+#     Concatenates y and residuals
+    df = pd.concat([y, residuals], axis=1)
+    
+#     Creates scatterplot
+    sns.scatterplot(x=df[y.name], y=df.resid)
+    plt.title('Residuals vs. Target')

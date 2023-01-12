@@ -243,12 +243,12 @@ def outlier_percentage(X ,y, model, resid_cutoff, columns):
 #         Finds minimum value of outlier entries
         min_val = min(out_df[c])
 #     Calculates percentage of outliers 
-        perc = round(100*(len(df[df[c] >= min_val]))/len_df, 5)
+        perc = round(100*(len(df[df[c] >= min_val]))/len_df, 2)
 #     Prints percentage
-        print(c + ': %' + str(perc))
+        print(c + ': ' + str(perc) + '%')
     
 
-def model6_data(X_train, y_train, X_test, y_test, 
+def model5_data(X_train, y_train, X_test, y_test, 
                 model, resid_cutoff, column):
     '''
     Creates new X and y data for entries lower than the minimum
