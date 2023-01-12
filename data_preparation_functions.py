@@ -172,6 +172,80 @@ def mse(model, X, y):
     inputs: model, X, y
     output: mean squared error
     '''
+#     Gets predictions using X
     pred = model.predict(sm.add_constant(X))
-    
+
+#     returns mean squared error
     return (mean_squared_error(y, pred))
+
+
+
+def outlier_percentage(X ,y, model, resid_cutoff, columns):
+    '''
+    Prints out the percentage of the dataframe that are outliers
+    depending on the residual cutoff
+    
+    Inputs: X = features
+            y = target variable
+            model = linear regression model
+            resid_cutoff = high residual mark
+            columns = columns to be checked
+    '''
+#     Concatenates features and target varibale    
+    df = pd.concat([X, y], axis=1)
+    
+#     Creates residual column in dataframe    
+    df['resid'] = model.resid
+    
+#     Creates DataFrame of  only entries with residuals greater 
+#     than resid_cutoff
+    out_df = df[df.resid > resid_cutoff]
+    
+#     Finds number of entries in original dataframe
+    len_df = len(y)
+
+#     Iterates through columns, printing out percentage of outliers
+    for c in columns:
+#         Finds minimum value of outlier entries
+        min_val = min(out_df[c])
+#     Calculates percentage of outliers 
+        perc = round(100*(len(df[df[c] >= min_val]))/len_df, 5)
+#     Prints percentage
+        print(c + ': %' + str(perc))
+    
+
+def model6_data(X, y, model, resid_cutoff, column):
+    '''
+    Creates new X and y data for entries lower than the minimum
+    value of column that is above or equal to the the resid_cutoff
+    value
+    
+     Inputs: X = features
+             y = target variable
+             model = linear regression model
+             resid_cutoff = high residual mark
+             column = column deciding cutoff
+    '''
+    
+#     Concatenates features and target varibale    
+    df = pd.concat([X, y], axis=1)
+    
+#     Creates residual column in dataframe    
+    df['resid'] = model.resid
+    
+#     Find minimum value dependent on residual cutoff
+    min_val = min(df[df.resid >= resid_cutoff][column])
+
+#     Creates datafrome of all entries lower than min_val
+    df = df[df[column] < min_val]
+    
+#     Drops residual column    
+    df.drop(columns='resid', axis=1, inplace=True)
+    
+#     Creates new target variable data
+    new_y = df[y.name]
+#     Creates new feature data
+    new_X = df.drop(columns=y.name, axis=1)
+    
+#     returns new data and min_val
+    return (new_X, new_y, min_val)

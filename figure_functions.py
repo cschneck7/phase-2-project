@@ -5,6 +5,7 @@ import numpy as np
 import statsmodels.api as sm
 from statsmodels.formula.api import ols
 import scipy.stats as stats
+import math
 
 plt.style.use('bmh')
     
@@ -79,9 +80,14 @@ def all_scatters(X_train, y_train):
     outputs: x vs. y Scatter plots
     '''
     
-    fig = plt.figure(constrained_layout=True, figsize=(12, 12))
+#     Calculates number of rows for figure, maxing at 3 columns
+    nrows = math.ceil(len(X_train.columns)/3)
     
-    gs = GridSpec(3, 3, figure=fig)
+#     Creates figure
+    fig = plt.figure(constrained_layout=True, figsize=(12, 4*nrows))
+    
+#     Creats figure layout
+    gs = GridSpec(nrows, 3, figure=fig)
     
 #     Gets name of target variable
     target_var = y_train.name
@@ -107,6 +113,7 @@ def assumption_plots(model, X_train, y_train):
 #     finds predicted values for training data 
     pred = model.predict(sm.add_constant(X_train))
     
+#     Creates figure
     fig, axes = plt.subplots(figsize=(16,8), ncols=2, nrows=1)
     
 #     Creates QQ-plot
@@ -114,11 +121,53 @@ def assumption_plots(model, X_train, y_train):
                       line='45', fit='True', ax=axes[0])
     axes[0].set_title('QQ Plot')
     
-#     
+#     Creates figure checking homoscedasticity
     axes[1].scatter(y_train, pred, color='red', label='Model')
     axes[1].plot(y_train, y_train, color='blue', label='Actual Data')
     axes[1].legend()
     axes[1].set_title('Model Predictions vs. Actual Data')
     axes[1].set_xlabel('Actual Data')
     axes[1].set_ylabel('Model Results')            
-            
+  
+
+
+ def high_resid_plots(X, y, model, resid_cutoff):
+    '''
+    Creates scatter plots for all features and target variable containing 
+    entries with residuals greater then assigned resid_cutoff
+    
+    Inputs: X = features
+            y = target variable
+            model = linear regression model
+            resid_cutoff = high residual mark
+    
+    Outputs: Scatter plots of all features and target variable of entries
+             greater than the resid_cutoff
+    '''
+#     Concatenates features and target varibale
+    df = pd.concat([X, y], axis=1)
+    
+#     Calculates number of rows in figure, maxing at 3 columns
+    nrows = math.ceil(len(df.columns)/3)
+#     Take column names of features to be plotted against the residuals
+    columns = df.columns
+    
+#     Creates residual column in dataframe
+    df['resid'] = model.resid
+#     Takes only entries with residuals greater than resid_cutoff
+    df = df[df.resid > resid_cutoff]
+    
+#     Creates figure
+    fig = plt.figure(constrained_layout=True, figsize=(12 ,nrows*4))
+    
+#     Creates figure layout
+    gs = GridSpec(nrows, 3, figure=fig)
+    
+    axes = []
+#     Iterates through columns, plotting feature vs. resid
+    for i, column in  enumerate(columns):
+        axes.append(fig.add_subplot(gs[i//3, i%3]))
+        axes[i].scatter(df[column], df.resid)
+        axes[i].set_xlabel(column)
+        axes[i].set_ylabel('Residuals')
+        axes[i].set_title('High Residuals vs. ' + column)    
