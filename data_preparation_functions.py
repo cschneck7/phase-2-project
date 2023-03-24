@@ -301,3 +301,60 @@ def model5_data(X_train, y_train, X_test, y_test,
                  'cutoff': min_val}
 #     returns dictionary of new data and min_val
     return data_dict
+
+
+
+def min_max_scaler(data, data0=None, test=False):
+    '''
+    Changes data to min-max  scale of (0-1).
+    If test is True, the min-max scaling is found using 
+        parameter data0
+    
+    inputs: data = data to be scaled
+            data0 = to find scaling parameters if variable data is
+                    being reverse scaled or is not being used 
+                    to create scaling
+            test = boolean deciding if operation is performed on the
+                   test split and needs to take scaling feature from
+                   parameter data0
+            
+    output: transformed data
+    '''
+
+#     To min-max scale test data using training data transformation
+    if test:
+            data0_min = data0.min()
+            data0_max = data0.max()
+            
+            data_scaled = (data - data0_min)/(data0_max - data0_min)
+            
+#     To min-max scale training data
+    else:
+#         Finding min and max values of data
+            data_min = data.min()
+            data_max = data.max()
+#         scaling data calculation
+            data_scaled = (data - data_min)/(data_max - data_min)
+
+#     returns scaled data
+    return data_scaled
+
+
+
+def RMSPE(X, y, model):
+    '''
+    Returns the root mean squared percentage error.
+    
+    inputs: X = independant variables
+            y = y
+            model = ole model
+            
+    output: root mean squared percent error
+    '''
+#     Gets predictions from model
+    pred = model.predict(sm.add_constant(X))
+
+#     Calculates rmspe
+    rmspe = np.sqrt(np.mean(((y - pred)/y)**2))
+    
+    return rmspe

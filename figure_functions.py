@@ -180,9 +180,7 @@ def homoskedasticity_plot(y, model):
     residuals = model.resid
 #     Names dataseries
     residuals.name = 'resid'
-#     Concatenates y and residuals
-    df = pd.concat([y, residuals], axis=1)
     
 #     Creates scatterplot
-    sns.scatterplot(x=df[y.name], y=df.resid)
+    sns.scatterplot(x=y, y=residuals)
     plt.title('Residuals vs. Target')
