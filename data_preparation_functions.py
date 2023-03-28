@@ -358,3 +358,27 @@ def RMSPE(X, y, model):
     rmspe = np.sqrt(np.mean(((y - pred)/y)**2))
     
     return rmspe
+
+def get_rates(model, X_train):
+    '''
+    Returns the rate of change per unit of features using
+    a min-max scale.
+    
+    inputs: model = model to pull coefficients from
+            X_train = training set used to set parameters
+                      for scaling transformation
+    
+    output: rates = rate of change per unit of feature
+    '''
+    
+#     Grabs coefficients of model, dropping constant
+    coef = model.params.drop(['const'])
+#     Finds minimum values of features
+    max_values = X_train.max()
+#     Finds maximum values of features
+    min_values = X_train.min()
+    
+#     Calculates rate of change per unit
+    rates = coef/(max_values-min_values)
+    
+    return rates
