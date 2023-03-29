@@ -184,3 +184,29 @@ def homoskedasticity_plot(y, model):
 #     Creates scatterplot
     sns.scatterplot(x=y, y=residuals)
     plt.title('Residuals vs. Target')
+    
+
+def top_rate_plots(rates):
+    '''
+    Creates two line plots showing the increase in house value by change
+    in sqft_living and grade
+    '''
+    
+#     creates x values for change in sqft_living
+    x_sl = np.linspace(0, 2000, num=9)
+#     creates x values for change in grade
+    x_g = np.linspace(0, 5, num=6)
+    
+    fig, axes = plt.subplots(figsize = (12,6), nrows=1, ncols=2)
+    
+#     Creates plot for sqft_living
+    axes[0].plot(x_sl, (x_sl*rates['sqft_living'])/1e3, '-o')
+    axes[0].set_xlabel('Square Feet')
+    axes[0].set_ylabel('Thousands of Dollars')
+    axes[0].set_title('Change in House Value by Change\nin Square Footage of Living Space')
+    
+#     Creates plot for grade
+    axes[1].plot(x_g, (x_g*rates['grade'])/1e3, '-o')
+    axes[1].set_xlabel('Grade')
+    axes[1].set_ylabel('Thousands of Dollars')
+    axes[1].set_title('Change in House Value by Change in Grade')
