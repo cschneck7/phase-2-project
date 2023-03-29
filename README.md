@@ -1,10 +1,6 @@
-# King County Home Improvements
+# A Look into King County Home Improvements
 
-## Flatiron Academy: Phase-2-Project
-
-##### Author: Carl Schneck
-
----
+![King County picture of shore line with houses](https://github.com/cschneck7/phase-2-project/blob/main/images/hero-lake-washington-xlg.jpg)
 
 #### Links
 
@@ -12,26 +8,9 @@
 [EDA and Modelling Notebook](EDA_and_Modelling.ipynb)<br/>
 [Presentation](Presentation.pdf)
 
----
-
-#### Navigating Repository
-
-Report Notebook: top-level<br/>
-EDA_and_Modelling Notebook<br/>
-Presentation: top-level<br/>
-Readme: top-level<br/>
-Data: data/<br/>
-Images: images/
-data_preparation_functions: top-level<br/>
-figure_functions: top-level<br/>
-
----
-
 ## Overview
 
 This project analyzes King County housing sales data in order to help lead a wholesale real estate investor make educated decisions on which home improvements best improve sales prices in the area. King County is the most populous county in Washington State, and 13th in the country.
-
----
 
 ## Business Understanding
 
@@ -39,13 +18,9 @@ A wholesale real estate investor wants to get a better idea of which improvement
 
 The area of interest is King County, Washington. Which is the most populous county of Washington state, and ranked 13th in the country. In order to complete the objective a dataset containing sales data for King County spanning the years 2014 to 2015 was analyzed.
 
----
-
 ## Data Understanding
 
 Our dataset includes information on houses sold in the timeframe spanning the years 2014 through 2015 and 70 zipcodes of King County. There are a total of 21,597 entries with 21 columns worth of information. For this analysis we will cut down this data to features we believe will be helpful for the client. These include features that can be improved after the purchase of a home. Features dealing with location, view or neighbooring properties are things that in most cases are impossible to change so will be ommited.
-
----
 
 ## Modeling
 
@@ -77,13 +52,9 @@ The top two features making an impact on the change in house price were `sqft_li
 
 The model struggled with passing all the assumptions, performing poorly on the normality and homoscedasticity checks. Though the model didn't perform well on these tests it is the best at this time. Any improvements made would complicate the model to a point that it is hard to understand.
 
----
-
 ## Conclusion
 
 This models goal was to find the features that had the largest affect on changing the price of a home. The approach was to only include variables that were deemed changeable, then build our model using these features. The final model has a Root Mean Squared Percent Error (RMSPE) of around 41% and an R<sup>2</sup> score of .521 therefore explaining around 52% of our target variables variance. The top two features were determined to be `sqft_living` and `grade`. A change of one `sqft_living` unit equates to a \$104.63 increase in price. While a single improvement in `grade` equates to a change of \$96,872 in price. Therefore it is suggested to either increase the square footage of the living space, or to remodel the living space to increase the grade of the home. Though before taking any action an analysis of material and labor costs should be taken into consideration. Since this model had a high RMSPE and didn't pass all the assumptions, it is hard to recommend its use with full confidence.
-
----
 
 ## Future Improvements
 
@@ -104,3 +75,14 @@ Looking at the homoscedastic check, the residuals on the tail with houses of hig
 #### Try the box-cox method
 
 The target variable `price` and feature `sqft_living` appear to have logarithmic curves. While this analysis attempted to transform the data using a log function it didn't pass the assumption test for homoscedasticity. The plot of residuals over the range showed a variance that was trending upwards. Upon research this could possibly be fixed using the box-cox method. The downside being it is not recommended if the goal is to infer information from the the individual feature coefficients since the transformation is exponential.
+
+## Repository Structure
+
+├── data
+├── images
+├── EDA_andModelling.ipynb
+├── Report.ipynb
+├── **init**.py
+├── data_preparation_functions.py
+├── figure_functions.py
+└── README.md
