@@ -82,6 +82,7 @@ The target variable `price` and feature `sqft_living` appear to have logarithmic
 ├── images
 ├── EDA_andModelling.ipynb
 ├── Report.ipynb
+├── Presentation.pdf
 ├── **init**.py
 ├── data_preparation_functions.py
 ├── figure_functions.py

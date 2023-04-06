@@ -202,11 +202,13 @@ def top_rate_plots(rates):
 #     Creates plot for sqft_living
     axes[0].plot(x_sl, (x_sl*rates['sqft_living'])/1e3, '-o')
     axes[0].set_xlabel('Square Feet')
-    axes[0].set_ylabel('Thousands of Dollars')
-    axes[0].set_title('Change in House Value by Change\nin Square Footage of Living Space')
+    axes[0].set_ylabel('Change in House Value\n(Thousands of Dollars)')
+    axes[0].set_title('Square Footage of Living Space')
     
 #     Creates plot for grade
     axes[1].plot(x_g, (x_g*rates['grade'])/1e3, '-o')
     axes[1].set_xlabel('Grade')
-    axes[1].set_ylabel('Thousands of Dollars')
-    axes[1].set_title('Change in House Value by Change in Grade')
+    axes[1].set_ylabel('Change in House Value\n(Thousands of Dollars)')
+    axes[1].set_title('Grade')
+    
+    fig.tight_layout(pad=5)
