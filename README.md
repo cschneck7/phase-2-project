@@ -78,12 +78,12 @@ The target variable `price` and feature `sqft_living` appear to have logarithmic
 
 ## Repository Structure
 
-├── data
-├── images
-├── EDA_andModelling.ipynb
-├── Report.ipynb
-├── Presentation.pdf
-├── **init**.py
-├── data_preparation_functions.py
-├── figure_functions.py
-└── README.md
+├── data<br/>
+├── images<br/>
+├── EDA_andModelling.ipynb<br/>
+├── Report.ipynb<br/>
+├── Presentation.pdf<br/>
+├── **init**.py<br/>
+├── data_preparation_functions.py<br/>
+├── figure_functions.py<br/>
+└── README.md<br/>

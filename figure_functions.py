@@ -212,3 +212,5 @@ def top_rate_plots(rates):
     axes[1].set_title('Grade')
     
     fig.tight_layout(pad=5)
+    
+#     fig.savefig('images/rate_plots.png', dpi=100)
